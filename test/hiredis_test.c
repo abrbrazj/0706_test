@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     redisContext *redis_conn = NULL;
     //redisReply *reply = NULL;
     int ret = 0;
+    char buf[4096] = {0};
 
     redis_conn = rop_connectdb_nopwd("127.0.0.1", "6379");
     if (redis_conn == NULL) {
@@ -31,12 +32,13 @@ int main(int argc, char *argv[])
     
     LOG(REIDS_TEST_MODULE, REIDS_TEST_PROC, "set %s %s succ", "gailun", "lol");
     
-    ret = rop_get_string(redis_conn, "gailun");
+    ret = rop_get_string(redis_conn, "gailun", buf);
     if (ret == -1) {
         LOG(REIDS_TEST_MODULE, REIDS_TEST_PROC, "get %s  error", "gailun");
         exit(1);
     }
     
+    printf("get:%s \n",buf);
     
     LOG(REIDS_TEST_MODULE, REIDS_TEST_PROC, "get %s succ", "gailun");
     
