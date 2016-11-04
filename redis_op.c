@@ -1060,7 +1060,7 @@ END:
     return retn;
 }
 
-int rop_get_string(redisContext *conn, char *key)
+int rop_get_string(redisContext *conn, char *key, char *buf)
 {
     int retn = 0;
 	redisReply *reply = NULL;
@@ -1071,7 +1071,9 @@ int rop_get_string(redisContext *conn, char *key)
         goto END;
     }
     //LOG(REIDS_TEST_MODULE, REIDS_TEST_PROC, "get: %s ", reply->str);
-    printf("%s\n", reply->str);
+    
+    strcpy(buf, reply->str);
+    //printf("%s\n", reply->str);
 	
 END:
 
