@@ -181,7 +181,7 @@ int rop_set_key_lifecycle(redisContext *conn, char *key, time_t delete_time);
 
 int rop_set_string(redisContext *conn, char *key, char *value);
 
-int rop_get_string(redisContext *conn, char *key);
+int rop_get_string(redisContext *conn, char *key, char *buf);
 
 
 /* -------------------------------------------*/
