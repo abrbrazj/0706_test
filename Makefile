@@ -2,7 +2,7 @@
 CC=gcc
 CPPFLAGS= -I./include  -I/usr/local/include/hiredis/
 CFLAGS=-Wall 
-LIBS= -lhiredis
+LIBS= -lhiredis -lfcgi
 
 #找到当前目录下所有的.c文件
 src = $(wildcard *.c)
@@ -14,8 +14,10 @@ obj = $(patsubst %.c, %.o, $(src))
 fdfs_test = ./test/fdfs_test
 main = main_test
 hiredis_test = ./test/hiredis_test
+test_fdfs_client = ./test/fdfs_client_test
+upload=upload
 
-target= $(main) $(hiredis_test)
+target= $(main) $(hiredis_test) $(upload) $(test_fdfs_client)
 
 
 ALL:$(target)
@@ -38,7 +40,13 @@ $(main):main.o make_log.o
 $(hiredis_test):./test/hiredis_test.o make_log.o redis_op.o
 	$(CC) $^ -o $@ $(LIBS)
 
-
+#upload程序
+$(upload):upload.o make_log.o redis_op.o
+	$(CC) $^ -o $@ $(LIBS)
+	
+#fdfs_client_test程序
+$(test_fdfs_client):./test/fdfs_client_test.o  make_log.o
+	$(CC) $^ -o $@ $(LIBS)
 
 #clean指令
 
