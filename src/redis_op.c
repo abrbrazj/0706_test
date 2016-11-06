@@ -1078,3 +1078,40 @@ END:
 	freeReplyObject(reply);
     return retn;
 }
+
+int rop_set_hash(redisContext *conn, char *key_name, char *fileid, char *value)
+{
+	nt retn = 0;
+	redisReply *reply = NULL;
+	reply = redisCommand(conn, "hset %s %s %s",key_name, fileid , value);
+    //rop_test_reply_type(reply);
+    if (strcmp(reply->str, "OK") != 0) {
+        retn = -1;
+        goto END;
+    }
+    
+END:
+
+	freeReplyObject(reply);
+    return retn;
+}
+
+int rop_get_hash(redisContext *conn, char *key_name, char *fileid, char *value)
+{
+	int retn = 0;
+	redisReply *reply = NULL;
+	reply = redisCommand(conn, "hget %s %s ",key_name, fileid);
+    //rop_test_reply_type(reply);
+    if (reply->type != REDIS_REPLY_STRING) {
+        retn = -1;
+        goto END;
+    }
+	
+	strcpy(value,reply->str)
+    //printf("%s\n", reply->str);
+
+END:
+
+	freeReplyObject(reply);
+    return retn;
+}
