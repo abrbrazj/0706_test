@@ -240,10 +240,10 @@ int main ()
 	    }
 	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "LPUSH succ:(%s)", file_id);
 	    
-	    /*
+	    
 	    //HASH_OF_FILE_ID_AND_NAME
 	    char *FILEID_NAME_HASH = "FILEID_NAME_HASH";
-	    ret = rop_set_hash(redis_conn, FILEID_NAME_HASH, file_id, file_name);
+	    ret = rop_set_hash(redis_conn, "HSET", FILEID_NAME_HASH, file_id, file_name);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, file_name);
 	        exit(1);
@@ -256,7 +256,7 @@ int main ()
 	    time_t timep;
 	    time(&timep);
 	    char *time = ctime(&timep);
-	    ret = rop_set_hash(redis_conn, FILEID_TIME_HASH, file_id, time);
+	    ret = rop_set_hash(redis_conn, "HSET", FILEID_TIME_HASH, file_id, time);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, time);
 	        exit(1);
@@ -269,7 +269,7 @@ int main ()
 	    char *buf_http = getenv("HTTP_REFERER");
 	    char *url = NULL;
 	    sprintf(url,"%s%s",buf_http, file_id);
-	    ret = rop_set_hash(redis_conn, FILEID_URL_HASH, file_id, url);
+	    ret = rop_set_hash(redis_conn, "HSET", FILEID_URL_HASH, file_id, url);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, url);
 	        exit(1);
@@ -281,13 +281,13 @@ int main ()
 	    char *FILEID_USR_HASH = "FILEID_USR_HASH";
 	    char *buf_user = getenv("HOME");
 	    char *user_name = buf_user + 6;
-	    ret = rop_set_hash(redis_conn, FILEID_USR_HASH, file_id, user_name);
+	    ret = rop_set_hash(redis_conn, "HSET", FILEID_USR_HASH, file_id, user_name);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, user_name);
 	        exit(1);
 	    }
 	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET succ:(%s : %s)", file_id, user_name);
-	    */
+	    
 	    
 	    
 	    /*
