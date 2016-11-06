@@ -395,4 +395,9 @@ int rop_redis_command(redisContext *conn, char *cmd);
 void rop_test_reply_type(redisReply *reply);
 
 
+int rop_set_hash(redisContext *conn, char *key_name, char *fileid, char *value);
+
+int rop_get_hash(redisContext *conn, char *key_name, char *fileid, char *value);
+
+
 #endif

@@ -25,6 +25,7 @@ static const char rcsid[] = "$Id: echo.c,v 1.5 1999/07/28 00:29:37 roberts Exp $
 #include <sys/types.h> 
 #include <sys/wait.h> 
 #include <unistd.h> 
+#include <time.h>
 
 #include "redis_op.h"
 
@@ -104,7 +105,7 @@ int main ()
 	int pfd[2];//¹ÜµÀfd
 	
 	redisContext *redis_conn = NULL;
-	char buf[4096] = {0};
+	//char buf[4096] = {0};
 	
 	int i = 0;
 	int len = 0;
@@ -229,20 +230,66 @@ int main ()
 	        exit(1);
 	    }
 		
-		/*Key:FILE_INFO_LIST	
-		Value:	file_id|url|filename|create	time|user|type
-		*/
-		char *Key = "FILE_INFO_LIST";
-		char Value[FILE_ID_LEN] = {0};
-		sprintf(Value,"%s|%s|%s|%s|%s|%s",file_id,NULL,file_name,NULL,NULL,NULL);
 		
-		ret = rop_list_push(redis_conn, Key, Value);
+		//LIST_OF_FILE_ID
+		char *Key_File_ID = "FILE_INFO_LIST";
+		ret = rop_list_push(redis_conn, Key_File_ID, file_id);
 		if (ret == -1) {
-	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "LPUSH error:(%s)", Value);
+	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "LPUSH error:(%s)", file_id);
 	        exit(1);
 	    }
-		
-	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "LPUSH succ:(%s)", Value);
+	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "LPUSH succ:(%s)", file_id);
+	    
+	    /*
+	    //HASH_OF_FILE_ID_AND_NAME
+	    char *FILEID_NAME_HASH = "FILEID_NAME_HASH";
+	    ret = rop_set_hash(redis_conn, FILEID_NAME_HASH, file_id, file_name);
+	    if (ret == -1) {
+	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, file_name);
+	        exit(1);
+	    }
+	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET succ:(%s : %s)", file_id, file_name);
+	    
+	    
+	    //HASH_OF_FILE_ID_AND_TIME
+	    char *FILEID_TIME_HASH = "FILEID_TIME_HASH";
+	    time_t timep;
+	    time(&timep);
+	    char *time = ctime(&timep);
+	    ret = rop_set_hash(redis_conn, FILEID_TIME_HASH, file_id, time);
+	    if (ret == -1) {
+	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, time);
+	        exit(1);
+	    }
+	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET succ:(%s : %s)", file_id, time);
+	    
+	    
+	    //HASH_OF_FILE_ID_AND_URL
+	    char *FILEID_URL_HASH = "FILEID_URL_HASH";
+	    char *buf_http = getenv("HTTP_REFERER");
+	    char *url = NULL;
+	    sprintf(url,"%s%s",buf_http, file_id);
+	    ret = rop_set_hash(redis_conn, FILEID_URL_HASH, file_id, url);
+	    if (ret == -1) {
+	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, url);
+	        exit(1);
+	    }
+	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET succ:(%s : %s)", file_id, url);
+	    
+	    
+	    //HASH_OF_FILE_ID_AND_USER
+	    char *FILEID_USR_HASH = "FILEID_USR_HASH";
+	    char *buf_user = getenv("HOME");
+	    char *user_name = buf_user + 6;
+	    ret = rop_set_hash(redis_conn, FILEID_USR_HASH, file_id, user_name);
+	    if (ret == -1) {
+	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, user_name);
+	        exit(1);
+	    }
+	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET succ:(%s : %s)", file_id, user_name);
+	    */
+	    
+	    
 	    /*
 	    ret = rop_set_string(redis_conn, file_name, buf);
 	    if (ret == -1) {
