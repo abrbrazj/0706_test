@@ -1,8 +1,8 @@
 
-CC=gcc
+CC=gcc 
 CPPFLAGS= -I./include  -I/usr/local/include/hiredis/
-CFLAGS=-Wall 
-LIBS= -lhiredis -lfcgi
+CFLAGS=-Wall -g
+LIBS= -lhiredis -lfcgi -lm
 
 #找到当前目录下所有的.c文件
 src = $(wildcard *.c)
@@ -16,8 +16,9 @@ main = main_test
 hiredis_test = ./test/hiredis_test
 test_fdfs_client = ./test/fdfs_client_test
 upload=upload
+cJSON_test = ./test/cJSON_test
 
-target= $(main) $(hiredis_test) $(upload) $(test_fdfs_client)
+target= $(main) $(hiredis_test) $(upload) $(test_fdfs_client) $(cJSON_test)
 
 
 ALL:$(target)
@@ -29,24 +30,28 @@ $(obj):%.o:%.c
 
 
 #fdfs_test程序
-#$(fdfs_test):./test/fdfs_test.o  make_log.o
+#$(fdfs_test):./test/fdfs_test.o  make_log.o cJSON.o
 #	$(CC) $^ -o $@ $(LIBS)
 
 #main程序
-$(main):main.o make_log.o
+$(main):main.o make_log.o cJSON.o
 	$(CC) $^ -o $@ $(LIBS)
 
 #hiredis_test程序
-$(hiredis_test):./test/hiredis_test.o make_log.o redis_op.o
+$(hiredis_test):./test/hiredis_test.o make_log.o redis_op.o cJSON.o
 	$(CC) $^ -o $@ $(LIBS)
 
 #upload程序
-$(upload):upload.o make_log.o redis_op.o
+$(upload):upload.o make_log.o redis_op.o cJSON.o
 	$(CC) $^ -o $@ $(LIBS)
 	
 #fdfs_client_test程序
-$(test_fdfs_client):./test/fdfs_client_test.o  make_log.o
+$(test_fdfs_client):./test/fdfs_client_test.o  make_log.o cJSON.o
 	$(CC) $^ -o $@ $(LIBS)
+	
+#cJSON_test程序
+$(cJSON_test):./test/cJSON_test.o cJSON.o
+	$(CC) $^ -o $@ $(LIBS) 
 
 #clean指令
 

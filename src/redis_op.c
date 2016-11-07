@@ -1060,7 +1060,7 @@ END:
     return retn;
 }
 
-int rop_get_string(redisContext *conn, char *key)
+int rop_get_string(redisContext *conn, char *key, char *buf)
 {
     int retn = 0;
 	redisReply *reply = NULL;
@@ -1070,26 +1070,32 @@ int rop_get_string(redisContext *conn, char *key)
         retn = -1;
         goto END;
     }
-   
-    printf("%s\n", reply->str);
-
+    //LOG(REIDS_TEST_MODULE, REIDS_TEST_PROC, "get: %s ", reply->str);
+    
+    strcpy(buf, reply->str);
+    //printf("%s\n", reply->str);
+	
 END:
 
 	freeReplyObject(reply);
     return retn;
 }
 
+
+
 int rop_set_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 {
-	nt retn = 0;
+    int retn = 0;
 	redisReply *reply = NULL;
-	reply = redisCommand(conn, "hset %s %s %s",key_name, fileid , value);
+	reply = redisCommand(conn, "HSET %s %s %s", key_name, fileid, value);
     //rop_test_reply_type(reply);
     if (strcmp(reply->str, "OK") != 0) {
         retn = -1;
         goto END;
     }
-    
+
+    //printf("%s\n", reply->str);
+
 END:
 
 	freeReplyObject(reply);
@@ -1099,19 +1105,23 @@ END:
 int rop_get_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 {
 	int retn = 0;
-	redisReply *reply = NULL;
-	reply = redisCommand(conn, "hget %s %s ",key_name, fileid);
-    //rop_test_reply_type(reply);
-    if (reply->type != REDIS_REPLY_STRING) {
-        retn = -1;
+    int len = 0;
+    redisReply *reply = NULL;
+
+    reply =  redisCommand(conn, "hget %s %s", key_name, fileid);
+    if (reply == NULL || reply->type != REDIS_REPLY_STRING) {
+        LOG(REDIS_LOG_MODULE, REDIS_LOG_PROC, "[-][GMS_REDIS]hget %s %s  error %s\n", key, field, conn->errstr);	
+        retn =  -1;
         goto END;
     }
-	
-	strcpy(value,reply->str)
-    //printf("%s\n", reply->str);
+    
+    len = reply->len > VALUES_ID_SIZE? VALUES_ID_SIZE:reply->len ; 
+    strncpy(value, reply->str, len);
+    value[len] = '\0';
 
 END:
+    freeReplyObject(reply);
 
-	freeReplyObject(reply);
+
     return retn;
 }

@@ -1,15 +1,3 @@
-/*
- * echo.c --
- *
- *	Produce a page containing all FastCGI inputs
- *
- *
- * Copyright (c) 1996 Open Market, Inc.
- *
- * See the file "LICENSE.TERMS" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
- *
- */
 #ifndef lint
 static const char rcsid[] = "$Id: echo.c,v 1.5 1999/07/28 00:29:37 roberts Exp $";
 #endif /* not lint */
@@ -83,6 +71,20 @@ char* memstr(char* full_data, int full_data_len, char* substr)
         cur++;
     }
     return NULL;
+}
+
+char* addstring(char *str)
+{
+	int len = strlen(str);
+	int i = 0;
+	for(i = len - 1; i >= 0; --i)
+	{
+		str[i+1] = str[i];	
+	} 
+	str[0] = '"';
+	str[len] = '"';
+	
+	return str;
 }
 
 

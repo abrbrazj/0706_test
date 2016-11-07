@@ -4,6 +4,7 @@
  */
 
 #include "redis_op.h"
+#include "make_log.h"
 
 
 /* -------------------------------------------*/
@@ -1080,13 +1081,18 @@ END:
 	freeReplyObject(reply);
     return retn;
 }
+
+
+
 int rop_set_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 {
     int retn = 0;
 	redisReply *reply = NULL;
+	
 	reply = redisCommand(conn, "HSET %s %s %s", key_name, fileid, value);
     //rop_test_reply_type(reply);
     if (strcmp(reply->str, "OK") != 0) {
+    	LOG("test", "fcgi_test", "[-][GMS_REDIS]hset %s %s %s error %s\n", key_name, fileid, value,conn->errstr);	
         retn = -1;
         goto END;
     }
@@ -1095,6 +1101,7 @@ int rop_set_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 
 END:
 
+	LOG("test", "fcgi_test", "[-][GMS_REDIS]hset %s %s %s \n", key_name, fileid, value);
 	freeReplyObject(reply);
     return retn;
 }
@@ -1102,20 +1109,23 @@ END:
 int rop_get_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 {
 	int retn = 0;
-	redisReply *reply = NULL;
-	reply = redisCommand(conn, "HGET %s %s", key_name, fileid);
-    //rop_test_reply_type(reply);
-    if (reply->type != REDIS_REPLY_STRING) {
-        retn = -1;
+    int len = 0;
+    redisReply *reply = NULL;
+
+    reply =  redisCommand(conn, "hget %s %s", key_name, fileid);
+    if (reply == NULL || reply->type != REDIS_REPLY_STRING) {
+        LOG(REDIS_LOG_MODULE, REDIS_LOG_PROC, "[-][GMS_REDIS]hget %s %s  error %s\n", key_name, fileid, conn->errstr);	
+        retn =  -1;
         goto END;
     }
-    //LOG(REIDS_TEST_MODULE, REIDS_TEST_PROC, "get: %s ", reply->str);
     
-    strcpy(value, reply->str);
-    //printf("%s\n", reply->str);
-	
-END:
+    len = reply->len > VALUES_ID_SIZE? VALUES_ID_SIZE:reply->len ; 
+    strncpy(value, reply->str, len);
+    value[len] = '\0';
 
-	freeReplyObject(reply);
+END:
+    freeReplyObject(reply);
+
+
     return retn;
 }
