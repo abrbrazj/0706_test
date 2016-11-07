@@ -1088,10 +1088,12 @@ int rop_set_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 {
     int retn = 0;
 	redisReply *reply = NULL;
+	char buf[2048] = {0};
 	
+	sprintf(buf,"HSET %s %s %s", key_name, fileid, value);	
+	LOG("test", "fcgi_test", "-------%s--------\n",buf);
 	reply = redisCommand(conn, "HSET %s %s %s", key_name, fileid, value);
-    //rop_test_reply_type(reply);
-    if (strcmp(reply->str, "OK") != 0) {
+    if (reply == NULL || reply->type != REDIS_REPLY_INTEGER) {
     	LOG("test", "fcgi_test", "[-][GMS_REDIS]hset %s %s %s error %s\n", key_name, fileid, value,conn->errstr);	
         retn = -1;
         goto END;
@@ -1114,7 +1116,7 @@ int rop_get_hash(redisContext *conn, char *key_name, char *fileid, char *value)
 
     reply =  redisCommand(conn, "hget %s %s", key_name, fileid);
     if (reply == NULL || reply->type != REDIS_REPLY_STRING) {
-        LOG(REDIS_LOG_MODULE, REDIS_LOG_PROC, "[-][GMS_REDIS]hget %s %s  error %s\n", key_name, fileid, conn->errstr);	
+        LOG("test", "fcgi_test", "[-][GMS_REDIS]hget %s %s %s error %s\n", key_name, fileid, value,conn->errstr);	
         retn =  -1;
         goto END;
     }

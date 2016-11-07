@@ -1,6 +1,6 @@
 
 CC=gcc 
-CPPFLAGS= -I./include  -I/usr/local/include/hiredis/
+CPPFLAGS= -I./include/  -I/usr/local/include/hiredis/ -I/usr/local/include/ 
 CFLAGS=-Wall -g
 LIBS= -lhiredis -lfcgi -lm
 
@@ -17,8 +17,9 @@ hiredis_test = ./test/hiredis_test
 test_fdfs_client = ./test/fdfs_client_test
 upload=upload
 cJSON_test = ./test/cJSON_test
+data=data
 
-target= $(main) $(hiredis_test) $(upload) $(test_fdfs_client) $(cJSON_test)
+target= $(main) $(hiredis_test) $(upload) $(test_fdfs_client) $(cJSON_test) $(data)
 
 
 ALL:$(target)
@@ -30,28 +31,32 @@ $(obj):%.o:%.c
 
 
 #fdfs_test程序
-#$(fdfs_test):./test/fdfs_test.o  make_log.o cJSON.o
+#$(fdfs_test):./test/fdfs_test.o  make_log.o cJSON.o util_cgi.o config.o
 #	$(CC) $^ -o $@ $(LIBS)
 
 #main程序
-$(main):main.o make_log.o cJSON.o
+$(main):main.o make_log.o cJSON.o config.o util_cgi.o cJSON.o
 	$(CC) $^ -o $@ $(LIBS)
 
 #hiredis_test程序
-$(hiredis_test):./test/hiredis_test.o make_log.o redis_op.o cJSON.o
+$(hiredis_test):./test/hiredis_test.o make_log.o redis_op.o cJSON.o util_cgi.o config.o
 	$(CC) $^ -o $@ $(LIBS)
 
 #upload程序
-$(upload):upload.o make_log.o redis_op.o cJSON.o
+$(upload):upload.o make_log.o redis_op.o cJSON.o util_cgi.o config.o
 	$(CC) $^ -o $@ $(LIBS)
 	
 #fdfs_client_test程序
-$(test_fdfs_client):./test/fdfs_client_test.o  make_log.o cJSON.o
+$(test_fdfs_client):./test/fdfs_client_test.o  make_log.o cJSON.o util_cgi.o config.o
 	$(CC) $^ -o $@ $(LIBS)
 	
 #cJSON_test程序
-$(cJSON_test):./test/cJSON_test.o cJSON.o
+$(cJSON_test):./test/cJSON_test.o cJSON.o util_cgi.o config.o
 	$(CC) $^ -o $@ $(LIBS) 
+	
+#data程序
+$(data):data.o make_log.o redis_op.o cJSON.o util_cgi.o config.o
+	$(CC) $^ -o $@ $(LIBS)
 
 #clean指令
 

@@ -28,6 +28,7 @@ extern char **environ;
 #endif
 
 #include "fcgi_stdio.h"
+#include "util_cgi.h"
 
 #define FCGI_TEST_MODULE "test"
 #define FCGI_TEST_PROC "fcgi_test"
@@ -44,7 +45,7 @@ static void PrintEnv(char *label, char **envp)
 	printf("</pre><p>\n");
 }
 
-
+/*
 char* memstr(char* full_data, int full_data_len, char* substr)
 {
     if (full_data == NULL || full_data_len <= 0 || substr == NULL) {
@@ -72,22 +73,7 @@ char* memstr(char* full_data, int full_data_len, char* substr)
     }
     return NULL;
 }
-
-char* addstring(char *str)
-{
-	int len = strlen(str);
-	int i = 0;
-	for(i = len - 1; i >= 0; --i)
-	{
-		str[i+1] = str[i];	
-	} 
-	str[0] = '"';
-	str[len] = '"';
-	
-	return str;
-}
-
-
+*/
 
 int main ()
 {
@@ -156,6 +142,9 @@ int main ()
 			}
 			printf("\n</pre><p>\n");
 		}
+		
+		PrintEnv("Request environment", environ);
+		PrintEnv("Initial environment", initialEnv);
 
 		/*做用户自定义操作*/
 		
@@ -220,6 +209,7 @@ int main ()
 	        close(pfd[1]);
 	        wait(NULL);
 	        read(pfd[0], file_id, FILE_ID_LEN);
+	        file_id[strlen(file_id) - 1] = '\0';
 			LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "upload file_id[%s] succ!", file_id);
 	    }
 	    
@@ -258,6 +248,7 @@ int main ()
 	    time_t timep;
 	    time(&timep);
 	    char *time = ctime(&timep);
+	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "time : %s", time);
 	    ret = rop_set_hash(redis_conn, FILEID_TIME_HASH, file_id, time);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, time);
@@ -268,9 +259,9 @@ int main ()
 	    
 	    //HASH_OF_FILE_ID_AND_URL
 	    char *FILEID_URL_HASH = "FILEID_URL_HASH";
-	    char *buf_http = getenv("HTTP_REFERER");
-	    char *url = NULL;
-	    sprintf(url,"%s%s",buf_http, file_id);
+	    //char *buf_http = getenv("HTTP_REFERER");
+	    char url[2048] = {0};
+	    sprintf(url,"%s/%s","129.168.179.140", file_id);
 	    ret = rop_set_hash(redis_conn, FILEID_URL_HASH, file_id, url);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, url);
@@ -281,15 +272,15 @@ int main ()
 	    
 	    //HASH_OF_FILE_ID_AND_USER
 	    char *FILEID_USR_HASH = "FILEID_USR_HASH";
-	    char *buf_user = getenv("HOME");
-	    char *user_name = buf_user + 6;
+	    //char *buf_user = getenv("HOME");
+	    char *user_name = "jr";
 	    ret = rop_set_hash(redis_conn, FILEID_USR_HASH, file_id, user_name);
 	    if (ret == -1) {
 	        LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET error:(%s : %s)", file_id, user_name);
 	        exit(1);
 	    }
 	    LOG(FCGI_TEST_MODULE, FCGI_TEST_PROC, "HSET succ:(%s : %s)", file_id, user_name);
-	    
+	    	    
 	    
 	    
 	    /*
@@ -312,9 +303,6 @@ int main ()
 	
 	    rop_disconnect(redis_conn);
 	    
-
-		PrintEnv("Request environment", environ);
-		PrintEnv("Initial environment", initialEnv);
 	} /* while */
 
 	return 0;
